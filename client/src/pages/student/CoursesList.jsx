@@ -5,6 +5,7 @@ import CourseCard from '../../components/student/CourseCard';
 import { AppContext } from '../../context/AppContext';
 import { useParams } from 'react-router-dom';
 import SearchBar from '../../components/student/SearchBar';
+import ChatBoat from '../../components/ChatBoat';
 
 const CoursesList = () => {
 
@@ -50,6 +51,7 @@ const CoursesList = () => {
                     {filteredCourse.map((course, index) => <CourseCard key={index} course={course} />)}
                 </div>
             </div>
+            <ChatBoat />
             <Footer />
         </>
     )

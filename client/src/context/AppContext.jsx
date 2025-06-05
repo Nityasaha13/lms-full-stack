@@ -19,6 +19,7 @@ export const AppContextProvider = (props) => {
     const [showLogin, setShowLogin] = useState(false)
     const [isEducator,setIsEducator] = useState(false)
     const [allCourses, setAllCourses] = useState([])
+    const [allJobs, setAllJobs] = useState([])
     const [userData, setUserData] = useState(null)
     const [enrolledCourses, setEnrolledCourses] = useState([])
 
@@ -36,7 +37,25 @@ export const AppContextProvider = (props) => {
             }
 
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message) 
+        }
+
+    }
+
+    const fetchAllJobs = async () => {
+
+        try {
+
+            const { data } = await axios.get(backendUrl + '/api/v1/job/get');
+
+            if (data.success) {
+                setAllJobs(data.jobs)
+            } else {
+                toast.error(data.message)
+            }
+
+        } catch (error) {
+            toast.error(error.message) 
         }
 
     }
@@ -137,6 +156,10 @@ export const AppContextProvider = (props) => {
         fetchAllCourses()
     }, [])
 
+    useEffect(() => {
+        fetchAllJobs()
+    }, [])
+
     // Fetch User's Data if User is Logged In
     useEffect(() => {
         if (user) {
@@ -150,6 +173,7 @@ export const AppContextProvider = (props) => {
         backendUrl, currency, navigate,
         userData, setUserData, getToken,
         allCourses, fetchAllCourses,
+        allJobs, fetchAllJobs,
         enrolledCourses, fetchUserEnrolledCourses,
         calculateChapterTime, calculateCourseDuration,
         calculateRating, calculateNoOfLectures,

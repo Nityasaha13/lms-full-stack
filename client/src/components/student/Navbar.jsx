@@ -47,8 +47,10 @@ const Navbar = () => {
         <div className="flex items-center gap-5">
           {
             user && <>
-              <button onClick={becomeEducator}>{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
-              | <Link to='/my-enrollments' >My Enrollments</Link>
+              <Link to="/">Home</Link>
+            | <Link to="/jobs">Jobs</Link>
+            | <Link to='/my-enrollments' >My Courses</Link>
+            | <button onClick={becomeEducator}>{isEducator ? 'Dashboard' : 'Unlock Dashboard'}</button>
             </>
           }
         </div>
@@ -61,9 +63,9 @@ const Navbar = () => {
       {/* For Phone Screens */}
       <div className='md:hidden flex items-center gap-2 sm:gap-5 text-gray-500'>
         <div className="flex items-center gap-1 sm:gap-2 max-sm:text-xs">
-          <button onClick={becomeEducator}>{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
+          <button onClick={becomeEducator}>{isEducator ? 'Dashboard' : 'Unlock Dashboard'}</button>
           | {
-            user && <Link to='/my-enrollments' >My Enrollments</Link>
+            user && <Link to='/my-enrollments' >My Courses</Link>
           }
         </div>
         {user

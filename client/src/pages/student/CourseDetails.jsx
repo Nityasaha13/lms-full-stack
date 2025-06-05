@@ -9,6 +9,7 @@ import humanizeDuration from 'humanize-duration'
 import YouTube from 'react-youtube';
 import { useAuth } from '@clerk/clerk-react';
 import Loading from '../../components/student/Loading';
+import ChatBoat from '../../components/ChatBoat';
 
 const CourseDetails = () => {
 
@@ -217,6 +218,7 @@ const CourseDetails = () => {
           </div>
         </div>
       </div>
+      <ChatBoat />
       <Footer />
     </>
   ) : <Loading />

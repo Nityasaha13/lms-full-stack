@@ -16,6 +16,10 @@ import Player from './pages/student/Player'
 import MyEnrollments from './pages/student/MyEnrollments'
 import Loading from './components/student/Loading'
 
+import Jobs from './pages/student/Jobs'
+import Browse from './pages/student/Browse'
+import JobDescription from './pages/student/JobDescription'
+
 const App = () => {
 
   const isEducatorRoute = useMatch('/educator/*');
@@ -39,6 +43,12 @@ const App = () => {
           <Route path='my-courses' element={<MyCourses />} />
           <Route path='student-enrolled' element={<StudentsEnrolled />} />
         </Route>
+
+        {/* <Route path="/jobs" element={<Jobs />} /> */}
+        <Route path="/jobs" element={<Browse />} />
+        <Route path="/browse" element={<Browse />} />
+        <Route path="/description/:id" element={<JobDescription />} />
+        
       </Routes>
     </div>
   )
