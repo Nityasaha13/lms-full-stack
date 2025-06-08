@@ -67,6 +67,7 @@ export const getAllJobs = async(req, res) => {
 export const getJobById = async(req, res) => {
         try {
             const jobId = req.params.id;
+            console.log("Job id: ", jobId);
             const job = await Job.findById(jobId).populate({
                 path: "applications"
             });
@@ -140,7 +141,7 @@ export const deleteJob = async(req, res) => {
 
 /**
  * Fetch jobs from RapidAPI (Startup Jobs API), clear old jobs, and save new ones.
- * The API is - http://localhost:5000/api/v1/job/fetch-jobs
+ * The API is - http://localhost:5000/api/job/fetch-jobs
  */
 export const fetchAndSaveJobs = async (req, res) => {
     try {

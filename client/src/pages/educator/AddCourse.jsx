@@ -150,6 +150,8 @@ const AddCourse = () => {
 
   return (
     <div className='h-screen overflow-scroll flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0'>
+    <div>
+      <h2 className="pb-4 text-lg font-medium">Add Course</h2>
       <form onSubmit={handleSubmit} className='flex flex-col gap-4 max-w-md w-full text-gray-500'>
         <div className='flex flex-col gap-1'>
           <p>Course Title</p>
@@ -263,6 +265,7 @@ const AddCourse = () => {
           ADD
         </button>
       </form>
+    </div>
     </div>
   );
 };

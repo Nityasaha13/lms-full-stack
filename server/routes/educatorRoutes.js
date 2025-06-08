@@ -1,25 +1,42 @@
 import express from 'express'
-import { addCourse, educatorDashboardData, getEducatorCourses, getEnrolledStudentsData, updateRoleToEducator } from '../controllers/educatorController.js';
+import { 
+    addCourse, 
+    educatorDashboardData, 
+    getEducatorCourses, 
+    getEnrolledStudentsData, 
+    updateRoleToEducator,
+    // Job related imports
+    addJob,
+    getEducatorJobs,
+    deleteJob,
+    // jobDashboardData,
+    // getAllJobs,
+    // getJobDetails
+} from '../controllers/educatorController.js';
 import upload from '../configs/multer.js';
 import { protectEducator } from '../middlewares/authMiddleware.js';
-
 
 const educatorRouter = express.Router()
 
 // Add Educator Role 
 educatorRouter.get('/update-role', updateRoleToEducator)
 
-// Add Courses 
+// Course Routes
 educatorRouter.post('/add-course', upload.single('image'), protectEducator, addCourse)
-
-// Get Educator Courses 
 educatorRouter.get('/courses', protectEducator, getEducatorCourses)
 
-// Get Educator Dashboard Data
+// Job Routes
+educatorRouter.post('/add-job', upload.single('image'), protectEducator, addJob)
+educatorRouter.get('/jobs', protectEducator, getEducatorJobs)
+educatorRouter.delete('/job/:jobId', protectEducator, deleteJob)
+// educatorRouter.get('/job-dashboard', protectEducator, jobDashboardData)
+
+// Public Job Routes (for job seekers)
+// educatorRouter.get('/all-jobs', getAllJobs)
+// educatorRouter.get('/job/:jobId', getJobDetails)
+
+// Dashboard Routes
 educatorRouter.get('/dashboard', protectEducator, educatorDashboardData)
-
-// Get Educator Students Data
 educatorRouter.get('/enrolled-students', protectEducator, getEnrolledStudentsData)
-
 
 export default educatorRouter;

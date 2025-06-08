@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary'
 import Course from '../models/Course.js';
+import { Job } from '../models/job.model.js';
 import { Purchase } from '../models/Purchase.js';
 import User from '../models/User.js';
 import { clerkClient } from '@clerk/express'
@@ -159,3 +160,83 @@ export const getEnrolledStudentsData = async (req, res) => {
         });
     }
 };
+
+
+// Add New Job
+export const addJob = async (req, res) => {
+    try {
+        const { jobData } = req.body
+        const imageFile = req.file
+        const creatorId = req.auth.userId
+
+        const parsedJobData = JSON.parse(jobData)
+
+        // Get creator name from Clerk
+        const user = await clerkClient.users.getUser(creatorId)
+        const creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Anonymous'
+
+        // Prepare job data
+        const jobInfo = {
+            ...parsedJobData,
+            created_by: creatorName
+        }
+
+        // Upload company logo if provided
+        if (imageFile) {
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path)
+            jobInfo.companyLogo = imageUpload.secure_url
+        }
+
+        const newJob = await Job.create(jobInfo)
+
+        res.json({ success: true, message: 'Job Posted Successfully' })
+
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// Get Educator Jobs
+export const getEducatorJobs = async (req, res) => {
+    try {
+        const creatorId = req.auth.userId
+
+        // Get creator name from Clerk
+        const user = await clerkClient.users.getUser(creatorId)
+        const creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Anonymous'
+
+        const jobs = await Job.find({ created_by: creatorName }).sort({ createdAt: -1 })
+
+        res.json({ success: true, jobs })
+
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// Delete Job
+export const deleteJob = async (req, res) => {
+    try {
+        const { jobId } = req.params
+        const creatorId = req.auth.userId
+
+        // Get creator name from Clerk
+        const user = await clerkClient.users.getUser(creatorId)
+        const creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Anonymous'
+
+        // Find and delete job only if it belongs to the creator
+        const job = await Job.findOneAndDelete({ 
+            _id: jobId, 
+            created_by: creatorName 
+        })
+
+        if (!job) {
+            return res.json({ success: false, message: 'Job not found or unauthorized' })
+        }
+
+        res.json({ success: true, message: 'Job deleted successfully' })
+
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}

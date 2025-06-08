@@ -11,6 +11,7 @@ import courseRouter from './routes/courseRoute.js'
 
 import chatboatRoutes from "./routes/chatboatroutes.js";
 import jobRoute from "./routes/job.route.js";
+import applicationRoute from "./routes/application.route.js";
 
 // Initialize Express
 const app = express()
@@ -40,8 +41,9 @@ app.use('/api/educator', express.json(), educatorRouter)
 app.use('/api/course', express.json(), courseRouter)
 app.use('/api/user', express.json(), userRouter)
 
-app.use("/api/v1/chatboat", chatboatRoutes);
-app.use("/api/v1/job", jobRoute);
+app.use("/api/chatboat", chatboatRoutes);
+app.use("/api/job", jobRoute);
+app.use("/api/application", applicationRoute);
 
 // Port
 const PORT = process.env.PORT || 5000

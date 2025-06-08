@@ -26,6 +26,8 @@ import time_clock_icon from './time_clock_icon.svg'
 import user_icon from './user_icon.svg'
 import home_icon from './home_icon.svg'
 import add_icon from './add_icon.svg'
+import job_icon from './job_icon.svg'
+import peoples from './peoples.svg'
 import my_course_icon from './my_course_icon.svg'
 import person_tick_icon from './person_tick_icon.svg'
 import facebook_icon from './facebook_icon.svg'
@@ -75,7 +77,9 @@ export const assets = {
     user_icon,
     home_icon,
     add_icon,
+    job_icon,
     my_course_icon,
+    peoples,
     person_tick_icon,
     facebook_icon,
     instagram_icon,

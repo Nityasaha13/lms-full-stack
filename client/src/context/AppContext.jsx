@@ -46,7 +46,7 @@ export const AppContextProvider = (props) => {
 
         try {
 
-            const { data } = await axios.get(backendUrl + '/api/v1/job/get');
+            const { data } = await axios.get(backendUrl + '/api/job/get');
 
             if (data.success) {
                 setAllJobs(data.jobs)

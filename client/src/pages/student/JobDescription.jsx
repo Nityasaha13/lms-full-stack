@@ -11,6 +11,7 @@ import { Card } from '../../components/ui/card';
 import { MapPin, Building, Clock, IndianRupeeIcon } from 'lucide-react';
 import { USER_API_END_POINT, JOB_API_END_POINT, APPLICATION_API_END_POINT } from '../../utils/constant';
 import { setsavedJobs } from '../../redux/authSlice';
+import ChatBoat from '../../components/ChatBoat';
 
 const JobDescription = () => {
     const { id: jobId } = useParams();
@@ -75,18 +76,18 @@ const JobDescription = () => {
     return (
         <>
             {/* <Navbar /> */}
-            <main className="pt-20 pb-16 bg-gradient-to-br from-[#00040A] to-[#001636] min-h-screen text-white px-4 sm:px-6">
+            <main className="pt-20 pb-16 bg-white min-h-screen text-black px-4 sm:px-6">
                 <div className="max-w-4xl mx-auto">
-                    <Card className="bg-gray-900 border-gray-800 p-4 sm:p-8">
+                    <Card className="bg-gray-100 border-gray-300 p-4 sm:p-8">
                         {/* Job Header */ }
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
                             <div className="mb-4 sm:mb-0">
-                                <h1 className="text-xl sm:text-2xl font-bold text-white">{ singleJob?.title || 'Job Title' }</h1>
+                                <h1 className="text-xl sm:text-2xl font-bold text-black">{ singleJob?.title || 'Job Title' }</h1>
                                 <p className="text-sm sm:text-base text-gray-400">{ singleJob?.location || 'Location not specified' }</p>
                             </div>
                             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                                 { savedJobs?.some((savedJob) => savedJob._id === singleJob?._id) ? (
-                                    <Button className="w-full sm:w-auto bg-green-500 text-white text-xs sm:text-sm">Saved Already</Button>
+                                    <Button className="w-full sm:w-auto bg-green-500 text-black text-xs sm:text-sm">Saved Already</Button>
                                 ) : (
                                     <Button
                                         className="w-full sm:w-auto bg-blue-700 text-white text-xs sm:text-sm"
@@ -110,19 +111,19 @@ const JobDescription = () => {
 
                         {/* Job Details */ }
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 mt-6">
-                            <div className="flex items-center text-xs sm:text-base text-gray-300">
+                            <div className="flex items-center text-xs sm:text-base text-blacktext-gray-800">
                                 <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                                 { singleJob?.location || 'Location not specified' }
                             </div>
-                            <div className="flex items-center text-xs sm:text-base text-gray-300">
+                            <div className="flex items-center text-xs sm:text-base text-blacktext-gray-800">
                                 <Building className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                                 { singleJob?.jobType || 'Job Type not specified' }
                             </div>
-                            <div className="flex items-center text-xs sm:text-base text-gray-300">
+                            <div className="flex items-center text-xs sm:text-base text-blacktext-gray-800">
                                 <Clock className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                                 { singleJob?.createdAt?.split('T')[0] || 'Not specified' }
                             </div>
-                            <div className="flex items-center text-xs sm:text-base text-gray-300">
+                            <div className="flex items-center text-xs sm:text-base text-blacktext-gray-800">
                                 <IndianRupeeIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                                 { singleJob?.salary?.length === 0
                                     ? 'Not Disclosed'
@@ -131,31 +132,32 @@ const JobDescription = () => {
                         </div>
 
                         <div className="mt-6 sm:mt-8">
-                            <h2 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-4">Job Description</h2>
-                            <p className="text-xs sm:text-base text-gray-300">{ singleJob?.description || 'Description not available' }</p>
+                            <h2 className="text-lg sm:text-xl font-semibold text-black mb-2 sm:mb-4">Job Description</h2>
+                            <p className="text-xs sm:text-base text-blacktext-gray-800">{ singleJob?.description || 'Description not available' }</p>
                         </div>
 
                         <div className="mt-6 sm:mt-8">
-                            <h2 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-4">Requirements</h2>
-                            <p className="text-xs sm:text-base text-gray-300">{ singleJob?.requirements || 'Description not available' }</p>
+                            <h2 className="text-lg sm:text-xl font-semibold text-black mb-2 sm:mb-4">Requirements</h2>
+                            <p className="text-xs sm:text-base text-blacktext-gray-800">{ singleJob?.requirements || 'Description not available' }</p>
                         </div>
 
                         {/* Experience */ }
                         <div className="mt-6 sm:mt-8">
-                            <h2 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-4">Experience Required</h2>
-                            <p className="text-xs sm:text-base text-gray-300">{ `${singleJob?.experienceLevel} years` || 'Not specified' }</p>
+                            <h2 className="text-lg sm:text-xl font-semibold text-black mb-2 sm:mb-4">Experience Required</h2>
+                            <p className="text-xs sm:text-base text-blacktext-gray-800">{ `${singleJob?.experienceLevel} years` || 'Not specified' }</p>
                         </div>
 
                         {/* Applications */ }
                         <div className="mt-6 sm:mt-8">
-                            <h2 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-4">Applications</h2>
-                            <p className="text-xs sm:text-base text-gray-300">
+                            <h2 className="text-lg sm:text-xl font-semibold text-black mb-2 sm:mb-4">Applications</h2>
+                            <p className="text-xs sm:text-base text-blacktext-gray-800">
                                 { singleJob?.applications?.length || 0 } applicants
                             </p>
                         </div>
                     </Card>
                 </div>
             </main>
+            <ChatBoat />
             <Footer />
         </>
     );

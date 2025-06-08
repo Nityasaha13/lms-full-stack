@@ -14,7 +14,7 @@ const filterData = [
     // },
     {
         filterType: "JobType",
-        array: ["FULL_TIME", "INTERN"]
+        array: ["FULL_TIME", "INTERN", 'PART_TIME', 'CONTRACT']
     }
 ];
 

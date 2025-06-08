@@ -45,11 +45,12 @@ const Navbar = () => {
       <img onClick={() => navigate('/')} src={assets.logo2} alt="Logo" className="w-28 lg:w-32 cursor-pointer" />
       <div className="md:flex hidden items-center gap-5 text-gray-500">
         <div className="flex items-center gap-5">
+          <Link to="/">Home</Link>
+          | <Link to="/jobs">Jobs</Link>
+          | <Link to="/course-list">Courses</Link>
           {
             user && <>
-              <Link to="/">Home</Link>
-            | <Link to="/jobs">Jobs</Link>
-            | <Link to='/my-enrollments' >My Courses</Link>
+            |<Link to='/my-enrollments' >My Courses</Link>
             | <button onClick={becomeEducator}>{isEducator ? 'Dashboard' : 'Unlock Dashboard'}</button>
             </>
           }
@@ -63,9 +64,12 @@ const Navbar = () => {
       {/* For Phone Screens */}
       <div className='md:hidden flex items-center gap-2 sm:gap-5 text-gray-500'>
         <div className="flex items-center gap-1 sm:gap-2 max-sm:text-xs">
-          <button onClick={becomeEducator}>{isEducator ? 'Dashboard' : 'Unlock Dashboard'}</button>
+            <Link to="/jobs">Jobs</Link>
+          | <Link to="/course-list">Courses</Link>
           | {
-            user && <Link to='/my-enrollments' >My Courses</Link>
+            user && <><Link to='/my-enrollments' >My Courses</Link>
+            | <button onClick={becomeEducator}>{isEducator ? 'Dashboard' : 'Unlock Dashboard'}</button>
+            </>
           }
         </div>
         {user
