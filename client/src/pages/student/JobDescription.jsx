@@ -133,7 +133,10 @@ const JobDescription = () => {
 
                         <div className="mt-6 sm:mt-8">
                             <h2 className="text-lg sm:text-xl font-semibold text-black mb-2 sm:mb-4">Job Description</h2>
-                            <p className="text-xs sm:text-base text-blacktext-gray-800">{ singleJob?.description || 'Description not available' }</p>
+                            <div
+                                className="text-xs sm:text-base text-gray-800"
+                                dangerouslySetInnerHTML={{ __html: singleJob?.description || 'Description not available' }}
+                            />
                         </div>
 
                         <div className="mt-6 sm:mt-8">

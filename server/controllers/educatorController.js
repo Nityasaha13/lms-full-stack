@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary'
 import Course from '../models/Course.js';
 import { Job } from '../models/job.model.js';
+import { Application } from '../models/application.model.js';
 import { Purchase } from '../models/Purchase.js';
 import User from '../models/User.js';
 import { clerkClient } from '@clerk/express'
@@ -178,7 +179,7 @@ export const addJob = async (req, res) => {
         // Prepare job data
         const jobInfo = {
             ...parsedJobData,
-            created_by: creatorName
+            created_by: creatorId
         }
 
         // Upload company logo if provided
@@ -240,3 +241,64 @@ export const deleteJob = async (req, res) => {
         res.json({ success: false, message: error.message })
     }
 }
+
+
+
+export const getAppliedCandidates = async (req, res) => {
+  try {
+    const educatorId = req.auth.userId;
+    // console.log("Educator ID:", educatorId);
+
+    // Get all jobs created by this educator
+    const jobs = await Job.find({ created_by: educatorId }).select('_id');
+    const jobIds = jobs.map(job => job._id);
+    // console.log("Job IDs found:", jobIds);
+
+    if (jobIds.length === 0) {
+      return res.status(200).json({
+        success: true,
+        applications: [],
+        message: 'No jobs found for this educator'
+      });
+    }
+
+    // Get all applications for those jobs with population
+    const applications = await Application.find({ job: { $in: jobIds } })
+      .populate({
+        path: 'applicant',
+        select: 'name email imageUrl',
+        model: 'User'
+      })
+      .populate({
+        path: 'job',
+        select: 'title',
+        model: 'Job'
+      })
+      .sort({ createdAt: -1 });
+
+    // console.log("Applications found:", applications.length);
+    // console.log("Sample application:", applications[0]);
+
+    // Check for failed populations
+    const failedPopulations = applications.filter(app => 
+      !app.applicant || !app.job
+    );
+    
+    if (failedPopulations.length > 0) {
+    //   console.log("Failed populations:", failedPopulations.length);
+    //   console.log("Sample failed application:", failedPopulations[0]);
+    }
+
+    res.status(200).json({
+      success: true,
+      applications,
+    });
+  } catch (error) {
+    // console.error("Error fetching applied candidates:", error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch applied candidates',
+      error: error.message
+    });
+  }
+};

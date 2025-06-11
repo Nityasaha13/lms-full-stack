@@ -7,7 +7,7 @@ const applicationSchema = new mongoose.Schema({
         required: true
     },
     applicant: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'User',
         required: true
     },

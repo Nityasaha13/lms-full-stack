@@ -14,6 +14,7 @@ const SideBar = () => {
     { name: 'Student Enrolled', path: '/educator/student-enrolled', icon: assets.person_tick_icon },
     { name: 'Add Job', path: '/educator/add-job', icon: assets.add_icon },
     { name: 'Added Jobs', path: '/educator/my-jobs', icon: assets.job_icon },
+    { name: 'Saved Jobs', path: '/educator/saved-jobs', icon: assets.job_icon },
     { name: 'Candidates', path: '/educator/applied-candidates', icon: assets.peoples },
   ];
 

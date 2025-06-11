@@ -11,6 +11,7 @@ import AddJob from './pages/educator/AddJob'
 import MyJobs from './pages/educator/MyJobs'
 import StudentsEnrolled from './pages/educator/StudentsEnrolled'
 import AppliedCandidates from './pages/educator/AppliedCandidates'
+import SavedJobs from './pages/educator/SavedJobs'
 import Educator from './pages/educator/Educator'
 import 'quill/dist/quill.snow.css'
 import 'react-toastify/dist/ReactToastify.css';
@@ -47,7 +48,8 @@ const App = () => {
           <Route path='add-job' element={<AddJob />} />
           <Route path='my-jobs' element={<MyJobs />} />
           <Route path='student-enrolled' element={<StudentsEnrolled />} />
-          <Route path='applied-candidates' element={<StudentsEnrolled />} />
+          <Route path='applied-candidates' element={<AppliedCandidates />} />
+          <Route path='saved-jobs' element={<SavedJobs />} />
         </Route>
 
         {/* <Route path="/jobs" element={<Jobs />} /> */}

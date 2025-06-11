@@ -9,6 +9,7 @@ import {
     addJob,
     getEducatorJobs,
     deleteJob,
+    getAppliedCandidates,
     // jobDashboardData,
     // getAllJobs,
     // getJobDetails
@@ -38,5 +39,6 @@ educatorRouter.delete('/job/:jobId', protectEducator, deleteJob)
 // Dashboard Routes
 educatorRouter.get('/dashboard', protectEducator, educatorDashboardData)
 educatorRouter.get('/enrolled-students', protectEducator, getEnrolledStudentsData)
+educatorRouter.get('/job-applicants', protectEducator, getAppliedCandidates)
 
 export default educatorRouter;
