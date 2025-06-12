@@ -206,7 +206,7 @@ export const getEducatorJobs = async (req, res) => {
         const user = await clerkClient.users.getUser(creatorId)
         const creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Anonymous'
 
-        const jobs = await Job.find({ created_by: creatorName }).sort({ createdAt: -1 })
+        const jobs = await Job.find({ created_by: creatorId }).sort({ createdAt: -1 })
 
         res.json({ success: true, jobs })
 

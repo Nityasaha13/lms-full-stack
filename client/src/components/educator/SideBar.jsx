@@ -12,9 +12,9 @@ const SideBar = () => {
     { name: 'Add Course', path: '/educator/add-course', icon: assets.add_icon },
     { name: 'Added Courses', path: '/educator/my-courses', icon: assets.my_course_icon },
     { name: 'Student Enrolled', path: '/educator/student-enrolled', icon: assets.person_tick_icon },
-    { name: 'Add Job', path: '/educator/add-job', icon: assets.add_icon },
-    { name: 'Added Jobs', path: '/educator/my-jobs', icon: assets.job_icon },
-    { name: 'Saved Jobs', path: '/educator/saved-jobs', icon: assets.job_icon },
+    { name: 'Add Job', path: '/educator/add-job', icon: assets.addjob_icon },
+    { name: 'Added Jobs', path: '/educator/my-jobs', icon: assets.job2_icon },
+    { name: 'Saved Jobs', path: '/educator/saved-jobs', icon: assets.savejob_icon },
     { name: 'Candidates', path: '/educator/applied-candidates', icon: assets.peoples },
   ];
 
