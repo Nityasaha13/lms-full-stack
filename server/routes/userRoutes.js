@@ -1,5 +1,5 @@
 import express from 'express'
-import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, updateUserCourseProgress, userEnrolledCourses, savedJobs, getSavedJobs } from '../controllers/userController.js';
+import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, updateUserCourseProgress, userEnrolledCourses, savedJobs, getSavedJobs, getCertificateData, canGetCertificate } from '../controllers/userController.js';
 import { protectEducator } from '../middlewares/authMiddleware.js';
 
 
@@ -14,5 +14,9 @@ userRouter.post('/get-course-progress', getUserCourseProgress)
 userRouter.post('/add-rating', addUserRating)
 userRouter.post('/savedjob', savedJobs)
 userRouter.get('/saved-jobs', getSavedJobs)
+
+
+userRouter.post('/get-certificate-data', getCertificateData);
+userRouter.post('/can-get-certificate', canGetCertificate);
 
 export default userRouter;

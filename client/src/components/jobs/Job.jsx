@@ -44,7 +44,7 @@ const Job = ({ job }) => {
 
     return (
         <div className="flex items-stretch gap-4 p-4">
-            <Card key={job.id} className="bg-white border-gray-200 w-full p-6 rounded-lg shadow-sm">
+            <Card key={job.id} className="bg-white border-gray-200 w-full p-6 rounded shadow-sm">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center">
                         <Avatar>

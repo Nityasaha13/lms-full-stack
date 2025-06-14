@@ -273,3 +273,182 @@ export const getSavedJobs = async (req, res) => {
     });
   }
 };
+
+
+
+
+export const getCertificateData = async (req, res) => {
+  try {
+    const { courseId } = req.body;
+    const userId = req.auth.userId; // From auth middleware
+
+    // Get course progress
+    const courseProgress = await CourseProgress.findOne({ 
+      userId: userId, 
+      courseId: courseId 
+    });
+
+    if (!courseProgress) {
+      return res.json({ 
+        success: false, 
+        message: "Course progress not found" 
+      });
+    }
+
+    // Get course details with educator info
+    const course = await Course.findById(courseId).populate('educator', 'name imageUrl');
+
+    if (!course) {
+      return res.json({ 
+        success: false, 
+        message: "Course not found" 
+      });
+    }
+
+    // Get user details
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+
+    // Calculate total lectures
+    let totalLectures = 0;
+    course.courseContent.forEach(chapter => {
+      totalLectures += chapter.chapterContent.length;
+    });
+
+    // Check if course is completed
+    const completedLectures = courseProgress.lectureCompleted.length;
+    const isCompleted = completedLectures === totalLectures;
+
+    if (!isCompleted) {
+      return res.json({ 
+        success: false, 
+        message: "Course not completed yet" 
+      });
+    }
+
+    // Calculate course duration
+    let totalDuration = 0;
+    course.courseContent.forEach(chapter => {
+      chapter.chapterContent.forEach(lecture => {
+        totalDuration += lecture.lectureDuration;
+      });
+    });
+
+    // Convert duration to human readable format
+    const hours = Math.floor(totalDuration / 60);
+    const minutes = totalDuration % 60;
+    const courseDuration = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+
+    // Generate certificate ID
+    const certificateId = `CERT-${Date.now()}-${userId.slice(-4).toUpperCase()}`;
+
+    // Format dates
+    const currentDate = new Date();
+    const issuedDate = currentDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const completionDate = courseProgress.updatedAt ? 
+      new Date(courseProgress.updatedAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }) : issuedDate;
+
+    // Determine course level based on duration or other criteria
+    let level = 'Beginner';
+    if (totalDuration > 300) { // More than 5 hours
+      level = 'Advanced';
+    } else if (totalDuration > 120) { // More than 2 hours
+      level = 'Intermediate';
+    }
+
+    const certificateData = {
+      studentName: user.name,
+      courseName: course.courseTitle,
+      instructorName: course.educator?.name || 'Unknown',
+      courseDuration: courseDuration,
+      totalLectures: totalLectures,
+      completedLectures: completedLectures,
+      completionDate: completionDate,
+      issuedDate: issuedDate,
+      level: level,
+      certificateId: certificateId,
+      verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify/${certificateId}`,
+      instructorSignature: course.educator?.imageUrl // Using instructor's image as signature placeholder
+    };
+
+    res.json({
+      success: true,
+      certificateData: certificateData
+    });
+
+  } catch (error) {
+    console.error('Error generating certificate:', error);
+    res.json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Check if user can get certificate (course completed)
+export const canGetCertificate = async (req, res) => {
+  try {
+    const { courseId } = req.body;
+    const userId = req.auth.userId;
+
+    const courseProgress = await CourseProgress.findOne({ 
+      userId: userId, 
+      courseId: courseId 
+    });
+
+    const course = await Course.findById(courseId);
+
+    if (!courseProgress || !course) {
+      return res.json({ 
+        success: true,
+        canGetCertificate: false,
+        progress: {
+          completed: 0,
+          total: 0,
+          percentage: 0
+        }
+      });
+    }
+
+    // Calculate total lectures
+    let totalLectures = 0;
+    course.courseContent.forEach(chapter => {
+      totalLectures += chapter.chapterContent.length;
+    });
+
+    const completedLectures = courseProgress.lectureCompleted.length;
+    const isCompleted = completedLectures === totalLectures;
+
+    res.json({
+      success: true,
+      canGetCertificate: isCompleted,
+      progress: {
+        completed: completedLectures,
+        total: totalLectures,
+        percentage: totalLectures > 0 ? Math.round((completedLectures / totalLectures) * 100) : 0
+      }
+    });
+
+  } catch (error) {
+    console.error('Error checking certificate eligibility:', error);
+    res.json({
+      success: false,
+      message: error.message
+    });
+  }
+};

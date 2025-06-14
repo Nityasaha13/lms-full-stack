@@ -27,6 +27,9 @@ import user_icon from './user_icon.svg'
 import home_icon from './home_icon.svg'
 import add_icon from './add_icon.svg'
 import job_icon from './job_icon.svg'
+import site_icon from './site_icon.png'
+import logo_blue from './logo_blue.png'
+import logo_white from './logo_white.png'
 import job2_icon from './job2_icon.svg'
 import savejob_icon from './savejob_icon.svg'
 import addjob_icon from './addjob_icon.svg'
@@ -81,6 +84,9 @@ export const assets = {
     home_icon,
     add_icon,
     job_icon,
+    site_icon,
+    logo_blue,
+    logo_white,
     job2_icon,
     savejob_icon,
     addjob_icon,

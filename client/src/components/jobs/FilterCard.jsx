@@ -54,16 +54,16 @@ const FilterCard = () => {
 
     return (
         <motion.div
-            className="w-full bg-transparent p-5 rounded-md shadow-md" // Ensuring responsiveness with Tailwind
+            className="w-full border bg-white border-gray-200 bg-transparent p-5 rounded-md shadow-md" // Ensuring responsiveness with Tailwind
             initial={ { opacity: 0 } }
             animate={ { opacity: 1 } }
             transition={ { duration: 0.5 } }
         >
-            <h1 className="font-bold text-lg text-blue-700">Filter Jobs</h1>
+            <h1 className="font-bold text-lg text-gray-900">Filter Jobs</h1>
             <hr className="mt-3" />
             { filterData.map((data, index) => (
                 <div key={ index } className="mt-3">
-                    <h1 className="font-bold text-md text-blue-600">{ data.filterType }</h1>
+                    <h1 className="font-bold text-md text-gray-900">{ data.filterType }</h1>
                     { data.array.map((item, idx) => {
                         const itemId = `id${index}-${idx}`;
                         const isChecked = selectedFilters[data.filterType].includes(item);

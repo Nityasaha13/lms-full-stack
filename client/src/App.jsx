@@ -22,6 +22,7 @@ import Loading from './components/student/Loading'
 
 import Jobs from './pages/student/Jobs'
 import Browse from './pages/student/Browse'
+import Certificate from './pages/student/Certifigate'
 import JobDescription from './pages/student/JobDescription'
 
 const App = () => {
@@ -40,6 +41,7 @@ const App = () => {
         <Route path="/course-list/:input" element={<CoursesList />} />
         <Route path="/my-enrollments" element={<MyEnrollments />} />
         <Route path="/player/:courseId" element={<Player />} />
+        <Route path="/certificate/:courseId" element={<Certificate />} />
         <Route path="/loading/:path" element={<Loading />} />
         <Route path='/educator' element={<Educator />}>
           <Route path='/educator' element={<Dashboard />} />

@@ -8,11 +8,11 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import Rating from '../../components/student/Rating';
 import Footer from '../../components/student/Footer';
-import Loading from '../../components/student/Loading';
+import Loading from '../../components/student/Loading'; 
 
 const Player = ({ }) => {
 
-  const { enrolledCourses, backendUrl, getToken, calculateChapterTime, userData, fetchUserEnrolledCourses } = useContext(AppContext)
+  const { enrolledCourses, backendUrl, getToken, calculateChapterTime, userData, fetchUserEnrolledCourses, navigate } = useContext(AppContext)
 
   const { courseId } = useParams()
   const [courseData, setCourseData] = useState(null)
@@ -20,6 +20,8 @@ const Player = ({ }) => {
   const [openSections, setOpenSections] = useState({});
   const [playerData, setPlayerData] = useState(null);
   const [initialRating, setInitialRating] = useState(0);
+  const [canGetCertificate, setCanGetCertificate] = useState(false);
+  const [certificateProgress, setCertificateProgress] = useState(null);
 
   const getCourseData = () => {
     enrolledCourses.map((course) => {
@@ -41,6 +43,28 @@ const Player = ({ }) => {
     }));
   };
 
+  const checkCertificateEligibility = async () => {
+    try {
+      const token = await getToken();
+      
+      const { data } = await axios.post(
+        `${backendUrl}/api/user/can-get-certificate`,
+        { courseId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (data.success) {
+        setCanGetCertificate(data.canGetCertificate);
+        setCertificateProgress(data.progress);
+      }
+    } catch (error) {
+      console.error('Error checking certificate eligibility:', error);
+    }
+  };
+
+  const handleGetCertificate = () => {
+    navigate(`/certificate/${courseId}`);
+  };
 
   useEffect(() => {
     if (enrolledCourses.length > 0) {
@@ -49,9 +73,7 @@ const Player = ({ }) => {
   }, [enrolledCourses])
 
   const markLectureAsCompleted = async (lectureId) => {
-
     try {
-
       const token = await getToken()
 
       const { data } = await axios.post(backendUrl + '/api/user/update-course-progress',
@@ -62,20 +84,19 @@ const Player = ({ }) => {
       if (data.success) {
         toast.success(data.message)
         getCourseProgress()
+        // Check certificate eligibility after completing a lecture
+        checkCertificateEligibility()
       } else {
         toast.error(data.message)
       }
 
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
     }
-
   }
 
   const getCourseProgress = async () => {
-
     try {
-
       const token = await getToken()
 
       const { data } = await axios.post(backendUrl + '/api/user/get-course-progress',
@@ -90,15 +111,12 @@ const Player = ({ }) => {
       }
 
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
     }
-
   }
 
   const handleRate = async (rating) => {
-
     try {
-
       const token = await getToken()
 
       const { data } = await axios.post(backendUrl + '/api/user/add-rating',
@@ -114,14 +132,13 @@ const Player = ({ }) => {
       }
 
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
     }
   }
 
   useEffect(() => {
-
     getCourseProgress()
-
+    checkCertificateEligibility()
   }, [])
 
   return courseData ? (
@@ -164,6 +181,65 @@ const Player = ({ }) => {
           ))}
         </div>
 
+        {/* Certificate Section */}
+        {certificateProgress && (
+          <div className="mt-10 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+              <span className="text-2xl">🎓</span>
+              Course Progress & Certificate
+            </h3>
+            <div className="mb-6">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Progress</span>
+                <span className="font-semibold">{certificateProgress.percentage}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out" 
+                  style={{ width: `${certificateProgress.percentage}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                {certificateProgress.completed} of {certificateProgress.total} lectures completed
+              </p>
+            </div>
+            
+            {canGetCertificate ? (
+              <div className="text-center">
+                <div className="mb-4">
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+                    🎉 Congratulations! Course Completed!
+                  </span>
+                </div>
+                <button 
+                  onClick={handleGetCertificate}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  🏆 Get Your Certificate
+                </button>
+                <p className="text-xs text-gray-500 mt-2">
+                  Click to view and download your certificate
+                </p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-3">
+                  Complete all lectures to unlock your certificate
+                </p>
+                <button 
+                  disabled
+                  className="bg-gray-300 text-gray-500 px-8 py-3 rounded-lg font-semibold cursor-not-allowed"
+                >
+                  🔒 Certificate Locked
+                </button>
+                <p className="text-xs text-gray-400 mt-2">
+                  {certificateProgress.total - certificateProgress.completed} lectures remaining
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className=" flex items-center gap-2 py-3 mt-10">
           <h1 className="text-xl font-bold">Rate this Course:</h1>
           <Rating initialRating={initialRating} onRate={handleRate} />
@@ -172,6 +248,7 @@ const Player = ({ }) => {
       </div>
 
       <div className='md:mt-10'>
+        {/* {console.log(playerData?.lectureTitle)} */}
         {
           playerData
             ? (
@@ -179,11 +256,20 @@ const Player = ({ }) => {
                 <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
                 <div className='flex justify-between items-center mt-1'>
                   <p className='text-xl '>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
-                  <button onClick={() => markLectureAsCompleted(playerData.lectureId)} className='text-blue-600'>{progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}</button>
+                  <button 
+                    onClick={() => markLectureAsCompleted(playerData.lectureId)} 
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      progressData && progressData.lectureCompleted.includes(playerData.lectureId) 
+                        ? 'bg-green-100 text-green-700 border border-green-200' 
+                        : 'bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200'
+                    }`}
+                  >
+                    {progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? '✅ Completed' : 'Mark Complete'}
+                  </button>
                 </div>
               </div>
             )
-            : <img src={courseData ? courseData.courseThumbnail : ''} alt="" />
+            : <img src={courseData ? courseData.courseThumbnail : ''} alt="" className="w-full rounded-lg" />
         }
       </div>
     </div>
