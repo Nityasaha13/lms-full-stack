@@ -3,8 +3,10 @@ import { AppContext } from "../../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Loading from "../../components/student/Loading";
+import { useNavigate } from "react-router-dom";
 
 const MyCourses = () => {
+  const navigate = useNavigate();
   const { backendUrl, isEducator, currency, getToken } = useContext(AppContext);
 
   const [courses, setCourses] = useState(null);
@@ -18,6 +20,32 @@ const MyCourses = () => {
       });
 
       data.success && setCourses(data.courses);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleEditCourse = (courseId) => {
+     navigate(`/educator/edit-course/${courseId}`);
+  };
+
+  const deleteCourse = async (courseId) => {
+    try {
+      const token = await getToken();
+
+      const { data } = await axios.delete(
+        backendUrl + `/api/educator/course/${courseId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        fetchEducatorCourses(); // Refresh the jobs list
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -45,6 +73,9 @@ const MyCourses = () => {
                   <th className="px-4 py-3 font-semibold truncate">Students</th>
                   <th className="px-4 py-3 font-semibold truncate">
                     Published On
+                  </th>
+                  <th className="px-4 py-3 font-semibold truncate">
+                    Action
                   </th>
                 </tr>
               </thead>
@@ -74,6 +105,31 @@ const MyCourses = () => {
                     </td>
                     <td className="px-4 py-3">
                       {new Date(course.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleEditCourse(course._id)}
+                          className="text-blue-500 hover:text-blue-700 text-sm"
+                        >
+                          Edit
+                        </button>
+                        <span className="text-gray-300">|</span>
+                        <button
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this Course?"
+                              )
+                            ) {
+                              deleteCourse(course._id);
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

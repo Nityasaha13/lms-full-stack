@@ -5,11 +5,16 @@ import {
     getEducatorCourses, 
     getEnrolledStudentsData, 
     updateRoleToEducator,
+    getCourseById,
     // Job related imports
     addJob,
     getEducatorJobs,
     deleteJob,
+    deleteCourse,
+    updateCourse,
     getAppliedCandidates,
+    updateJob,
+    getJobById,
     // jobDashboardData,
     // getAllJobs,
     // getJobDetails
@@ -24,12 +29,17 @@ educatorRouter.get('/update-role', updateRoleToEducator)
 
 // Course Routes
 educatorRouter.post('/add-course', upload.single('image'), protectEducator, addCourse)
+educatorRouter.put('/course/:id', upload.single('image'), protectEducator, updateCourse)
+educatorRouter.get('/course/:id', protectEducator, getCourseById);
 educatorRouter.get('/courses', protectEducator, getEducatorCourses)
 
 // Job Routes
 educatorRouter.post('/add-job', upload.single('image'), protectEducator, addJob)
+educatorRouter.put('/job/:jobId', upload.single('image'), protectEducator, updateJob)
+educatorRouter.get('/job/:jobId', protectEducator, getJobById)
 educatorRouter.get('/jobs', protectEducator, getEducatorJobs)
 educatorRouter.delete('/job/:jobId', protectEducator, deleteJob)
+educatorRouter.delete('/course/:courseId', protectEducator, deleteCourse)
 // educatorRouter.get('/job-dashboard', protectEducator, jobDashboardData)
 
 // Public Job Routes (for job seekers)

@@ -24,6 +24,8 @@ import Jobs from './pages/student/Jobs'
 import Browse from './pages/student/Browse'
 import Certificate from './pages/student/Certifigate'
 import JobDescription from './pages/student/JobDescription'
+import EditJob from './pages/educator/EditJob'
+import EditCourse from './pages/educator/EditCourse'
 
 const App = () => {
 
@@ -46,8 +48,10 @@ const App = () => {
         <Route path='/educator' element={<Educator />}>
           <Route path='/educator' element={<Dashboard />} />
           <Route path='add-course' element={<AddCourse />} />
+          <Route path='edit-course/:id' element={<EditCourse />} />
           <Route path='my-courses' element={<MyCourses />} />
           <Route path='add-job' element={<AddJob />} />
+          <Route path='edit-job/:id' element={<EditJob />} />
           <Route path='my-jobs' element={<MyJobs />} />
           <Route path='student-enrolled' element={<StudentsEnrolled />} />
           <Route path='applied-candidates' element={<AppliedCandidates />} />

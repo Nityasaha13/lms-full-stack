@@ -222,13 +222,13 @@ export const deleteJob = async (req, res) => {
         const creatorId = req.auth.userId
 
         // Get creator name from Clerk
-        const user = await clerkClient.users.getUser(creatorId)
-        const creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Anonymous'
+        // const user = await clerkClient.users.getUser(creatorId)
+        // const creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Anonymous'
 
         // Find and delete job only if it belongs to the creator
         const job = await Job.findOneAndDelete({ 
             _id: jobId, 
-            created_by: creatorName 
+            created_by: creatorId 
         })
 
         if (!job) {
@@ -302,3 +302,248 @@ export const getAppliedCandidates = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+// Delete Course
+export const deleteCourse = async (req, res) => {
+    try {
+        const { courseId } = req.params
+        const creatorId = req.auth.userId
+
+        // Get creator name from Clerk
+        // const user = await clerkClient.users.getUser(creatorId)
+        // const creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Anonymous'
+
+        // Find and delete job only if it belongs to the creator
+        const course = await Course.findOneAndDelete({ 
+            _id: courseId, 
+            educator: creatorId 
+        })
+
+        if (!course) {
+            return res.json({ success: false, message: 'Course not found or unauthorized' })
+        }
+
+        res.json({ success: true, message: 'Course deleted successfully' })
+
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
+
+
+
+// Get Single Job for Editing
+export const getJobById = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+        const educatorId = req.auth.userId;
+
+        // Find job and verify ownership
+        const job = await Job.findOne({ 
+            _id: jobId, 
+            created_by: educatorId 
+        });
+
+        // console.log("Got the job");
+
+        if (!job) {
+            return res.json({ 
+                success: false, 
+                message: 'Job not found or you are not authorized to edit this job' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            job 
+        });
+
+    } catch (error) {
+        res.json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
+};
+
+// Update Job
+export const updateJob = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+        const { jobData } = req.body;
+        const imageFile = req.file;
+        const educatorId = req.auth.userId;
+
+        const parsedJobData = JSON.parse(jobData);
+
+        // Find job and verify ownership
+        const existingJob = await Job.findOne({ 
+            _id: jobId, 
+            created_by: educatorId 
+        });
+
+        if (!existingJob) {
+            return res.json({ 
+                success: false, 
+                message: 'Job not found or you are not authorized to edit this job' 
+            });
+        }
+
+        // Prepare updated job data
+        const updatedJobInfo = {
+            ...parsedJobData,
+            updatedAt: new Date()
+        };
+
+        // Upload new company logo if provided
+        if (imageFile) {
+            // Delete old image from cloudinary if it exists
+            if (existingJob.companyLogo) {
+                try {
+                    // Extract public_id from the URL to delete from cloudinary
+                    const publicId = existingJob.companyLogo.split('/').pop().split('.')[0];
+                    await cloudinary.uploader.destroy(publicId);
+                } catch (deleteError) {
+                    console.log('Error deleting old image:', deleteError.message);
+                }
+            }
+
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path);
+            updatedJobInfo.companyLogo = imageUpload.secure_url;
+        }
+
+        // Update the job
+        const updatedJob = await Job.findByIdAndUpdate(
+            jobId,
+            updatedJobInfo,
+            { new: true }
+        );
+
+        res.json({ 
+            success: true, 
+            message: 'Job Updated Successfully',
+            job: updatedJob
+        });
+
+    } catch (error) {
+        res.json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+// Get Single Course for Editing
+export const getCourseById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const educatorId = req.auth.userId;
+
+
+        const course = await Course.findOne({ 
+            _id: id, 
+            educator: educatorId 
+        });
+
+        if (!course) {
+            return res.json({ success: false, message: 'Course not found or unauthorized' });
+        }
+
+        res.json({ success: true, course });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// Update Course - Fixed version
+export const updateCourse = async (req, res) => {
+    try {
+        // Change this to match your route parameter
+        const { id } = req.params; // Changed from courseId to id
+        const { courseData } = req.body;
+        const imageFile = req.file;
+        const educatorId = req.auth.userId;
+
+        // console.log('Updating course with ID:', id);
+        // console.log('Updating course with EDUCATOR ID:', educatorId);
+        // console.log('Course data received:', courseData);
+
+        const parsedCourseData = JSON.parse(courseData);
+
+        // Find course and verify ownership
+        const existingCourse = await Course.findOne({ 
+            _id: id, 
+            educator: educatorId 
+        });
+
+        // console.log('Existing course found:', existingCourse);
+
+        if (!existingCourse) {
+            return res.json({ 
+                success: false, 
+                message: 'Course not found or you are not authorized to edit this course' 
+            });
+        }
+
+        // Prepare updated course data
+        const updatedCourseInfo = {
+            ...parsedCourseData,
+            updatedAt: new Date()
+        };
+
+        // Upload new thumbnail if provided
+        if (imageFile) {
+            // Delete old image from cloudinary if it exists
+            if (existingCourse.courseThumbnail) {
+                try {
+                    // Extract public_id from the URL to delete from cloudinary
+                    const publicId = existingCourse.courseThumbnail.split('/').pop().split('.')[0];
+                    await cloudinary.uploader.destroy(publicId);
+                } catch (deleteError) {
+                    console.log('Error deleting old image:', deleteError.message);
+                }
+            }
+
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path);
+            updatedCourseInfo.courseThumbnail = imageUpload.secure_url;
+        }
+
+        // Update the course
+        const updatedCourse = await Course.findByIdAndUpdate(
+            id, // Changed from courseId to id
+            updatedCourseInfo,
+            { new: true }
+        );
+
+        // console.log('Course updated successfully:', updatedCourse._id);
+
+        res.json({ 
+            success: true, 
+            message: 'Course Updated Successfully',
+            course: updatedCourse
+        });
+
+    } catch (error) {
+        console.error('Error updating course:', error);
+        res.json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
+}

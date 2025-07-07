@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -6,6 +7,7 @@ import Loading from "../../components/student/Loading";
 
 const MyJobs = () => {
   const { backendUrl, isEducator, currency, getToken } = useContext(AppContext);
+  const navigate = useNavigate();
 
   const [jobs, setJobs] = useState(null);
 
@@ -45,6 +47,10 @@ const MyJobs = () => {
     } catch (error) {
       toast.error(error.message);
     }
+  };
+
+  const handleEditJob = (jobId) => {
+     navigate(`/educator/edit-job/${jobId}`);
   };
 
   useEffect(() => {
@@ -112,20 +118,29 @@ const MyJobs = () => {
                       {new Date(job.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              "Are you sure you want to delete this job?"
-                            )
-                          ) {
-                            deleteJob(job._id);
-                          }
-                        }}
-                        className="text-red-500 hover:text-red-700 text-sm"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleEditJob(job._id)}
+                          className="text-blue-500 hover:text-blue-700 text-sm"
+                        >
+                          Edit
+                        </button>
+                        <span className="text-gray-300">|</span>
+                        <button
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this job?"
+                              )
+                            ) {
+                              deleteJob(job._id);
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
