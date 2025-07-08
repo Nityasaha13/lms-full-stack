@@ -18,9 +18,7 @@ const AppliedCandidates = () => {
       const { data } = await axios.get(`${backendUrl}/api/educator/job-applicants`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       console.log("Response data:", data);
-
       if (data.success) {
         console.log("Applications received:", data.applications);
         setApplications(data.applications.reverse());
@@ -34,6 +32,38 @@ const AppliedCandidates = () => {
       setApplications([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchApplicantResume = async (applicantId) => {
+    try {
+      const token = await getToken();
+
+      const { data } = await axios.get(`${backendUrl}/api/user/get-resume/${applicantId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (data.success) {
+        // Open the resume in a new tab
+        window.open(data.resumeUrl, '_blank');
+      } else {
+        toast.error('Resume not found for this applicant');
+      }
+
+    } catch (error) {
+      if (error.response?.status === 404) {
+        toast.error('This applicant has not uploaded a resume yet');
+      } else {
+        toast.error(error.response?.data?.message || error.message);
+      }
+    }
+  };
+
+  const handleViewResume = (applicantId) => {
+    if (applicantId) {
+      fetchApplicantResume(applicantId);
+    } else {
+      toast.error('Unable to retrieve applicant information');
     }
   };
 
@@ -72,7 +102,7 @@ const AppliedCandidates = () => {
     <div className="min-h-screen flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0">
       <div>
         <h2 className="pb-4 text-lg font-medium">Applied Candidates ({applications.length})</h2>
-        <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">
+        <div className="flex flex-col items-center max-w-5xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">
           <table className="table-fixed md:table-auto w-full overflow-hidden pb-4">
             <thead className="text-gray-900 border-b border-gray-500/20 text-sm text-left">
               <tr>
@@ -81,6 +111,7 @@ const AppliedCandidates = () => {
                 <th className="px-4 py-3 font-semibold">Job Title</th>
                 <th className="px-4 py-3 font-semibold hidden sm:table-cell">Applied On</th>
                 <th className="px-4 py-3 font-semibold hidden sm:table-cell">Status</th>
+                <th className="px-4 py-3 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="text-sm text-gray-500">
@@ -118,6 +149,14 @@ const AppliedCandidates = () => {
                       }`}>
                         {item.status || 'pending'}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleViewResume(item.applicant?._id || item.applicant?.id)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors text-xs"
+                      >
+                        View Resume
+                      </button>
                     </td>
                   </tr>
                 );

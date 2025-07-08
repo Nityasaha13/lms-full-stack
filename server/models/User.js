@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
             ref: 'Job'
         }
     ],
+    resume: { type: String, default: '' }, 
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);

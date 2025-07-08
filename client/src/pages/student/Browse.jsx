@@ -8,6 +8,7 @@ import { Input } from '../../components/ui/input';
 import Footer from '../../components/student/Footer';
 import FilterCard from '../../components/jobs/FilterCard';
 import Job from '../../components/jobs/Job';
+import ChatBoat from '../../components/ChatBoat';
 
 const Browse = () => {
     const dispatch = useDispatch();
@@ -107,6 +108,7 @@ const Browse = () => {
                     </div>
                 </div>
             </div>
+            <ChatBoat />
             <Footer />
         </>
     );

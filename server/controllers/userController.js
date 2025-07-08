@@ -3,6 +3,10 @@ import { CourseProgress } from "../models/CourseProgress.js"
 import { Purchase } from "../models/Purchase.js"
 import User from "../models/User.js"
 import stripe from "stripe"
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { v2 as cloudinary } from 'cloudinary';
 
 
 
@@ -450,5 +454,175 @@ export const canGetCertificate = async (req, res) => {
       success: false,
       message: error.message
     });
+  }
+};
+
+
+
+
+
+// File upload configuration using multer
+export const addResume = async (req, res) => {
+  try {
+    const userId = req.auth.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Check if file is uploaded
+    const resumeFile = req.file;
+    if (!resumeFile) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    // Validate file type (only PDF files)
+    if (resumeFile.mimetype !== 'application/pdf') {
+      return res.status(400).json({ success: false, message: "Only PDF files are allowed" });
+    }
+
+    // If user already has a resume, delete the old one from Cloudinary
+    if (user.resume) {
+      try {
+        // Extract public_id from the URL
+        const publicId = user.resume.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+      } catch (error) {
+        console.log('Error deleting old resume:', error);
+      }
+    }
+
+    // Upload to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(resumeFile.path, {
+      resource_type: 'raw',
+      folder: 'resumes',
+      public_id: `resume_${userId}_${Date.now()}`,
+      use_filename: true,
+      unique_filename: false,
+      access_mode: 'public'
+    });
+
+    // Delete the temporary file
+    fs.unlinkSync(resumeFile.path);
+
+    // Update user's resume URL
+    user.resume = uploadResult.secure_url;
+    await user.save();
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Resume uploaded successfully", 
+      resumeUrl: user.resume 
+    });
+
+  } catch (error) {
+    console.error('Error uploading resume:', error);
+    
+    // Delete temporary file if it exists
+    if (req.file && req.file.path) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error deleting temporary file:', unlinkError);
+      }
+    }
+    
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getUserResume = async (req, res) => {
+  try {
+    const userId = req.auth.userId;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    
+    if (!user.resume) {
+      return res.status(404).json({ success: false, message: "Resume not found" });
+    }
+    
+    res.status(200).json({ 
+      success: true, 
+      resumeUrl: user.resume 
+    });
+
+  } catch (error) {
+    console.error('Error getting resume:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteResume = async (req, res) => {
+  try {
+    const userId = req.auth.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (!user.resume) {
+      return res.status(404).json({ success: false, message: "Resume not found" });
+    }
+
+    // Delete from Cloudinary
+    try {
+      const publicId = user.resume.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+    } catch (error) {
+      console.log('Error deleting from Cloudinary:', error);
+    }
+
+    // Remove resume from user document
+    user.resume = '';
+    await user.save();
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Resume deleted successfully" 
+    });
+
+  } catch (error) {
+    console.error('Error deleting resume:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const getUserResumeById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const requestingUserId = req.auth.userId;
+
+    // Find the user whose resume is being requested
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    
+    // Check if the user has uploaded a resume
+    if (!user.resume) {
+      return res.status(404).json({ success: false, message: "Resume not found for this user" });
+    }
+
+    // Optional: Add additional security checks here
+    // For example, you might want to verify that the requesting user (educator)
+    // has permission to view this specific user's resume
+    // This could involve checking if the user has applied to the educator's jobs
+    
+    res.status(200).json({ 
+      success: true, 
+      resumeUrl: user.resume,
+      userName: user.name // Optional: include user name for reference
+    });
+
+  } catch (error) {
+    console.error('Error getting user resume by ID:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
